@@ -1,7 +1,8 @@
 {
-    "data": {
-        "name": "kika-API",
-        "description": "New API for receiving posts and sending to the React application",
-        "date": "27-04-2023"
-    }
+    "data": [
+        {
+        "name": "Kika Carvalho",
+        "description": "Graduada em Artes Visuais (Licenciatura) pela Universidade Federal do Espírito Santo - UFES. Sua prática artística se materializa em diferentes suportes, técnicas e escalas, com uma pesquisa atenta em torno da cor azul, que pode estar relacionada tanto com as paisagens da cidade-ilha onde nasceu, como com aspectos da história da pintura. Sua obra é atravessada por questões ultramarinas de presença e ausência, tão caras à diáspora Atlântica. Sua produção também é entrecruzada por algumas experiências, como a prática de pintura urbana e a arte educação; além da participação em programas de residências artísticas, como: Angola AIR - Espaço Luanda Arte (2022); Outra Margem (2021); Vila Sul - Instituto Goethe de Salvador (2020);  e Malungas (2018), com a artista brasileira Rosana Paulino.",
+        "date": "04/2023"
+    }]
 }

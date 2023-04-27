@@ -7,7 +7,7 @@ const server = createServer((req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   // Read the contents of the JSON file
-  fs.readFile('example.json', 'utf8', (err, data) => {
+  readFile('example.json', 'utf8', (err, data) => {
     if (err) {
       // Handle any errors that occur while reading the file
       res.statusCode = 500;
