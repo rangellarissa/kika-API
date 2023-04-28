@@ -3,7 +3,7 @@ import { readFile } from 'fs';
 
 const server = createServer((req, res) => {
   // Set the content type to JSON
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://kika-app.vercel.app, http://127.0.0.1:5173');
   res.setHeader('Content-Type', 'application/json');
 
   // Read the contents of the JSON file
