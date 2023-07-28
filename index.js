@@ -27,7 +27,7 @@ app.get("/", async (req, res) => {
 })
 
 
-app.get("/api/:table", async (req, res) => {
+app.get("/:table", async (req, res) => {
   try {
     const { table } = req.params;
     if(!tables.includes(table)){
