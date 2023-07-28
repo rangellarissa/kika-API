@@ -8,10 +8,10 @@ const {
     create,
     update,
     remove,
-} = require("./client/database");
+} = require("../client/database");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { Tables } = require("./utils/constants");
+const { Tables } = require("../utils/constants");
 
 const app = express();
 const port = process.env.PORT;
@@ -93,6 +93,8 @@ app.delete("/api/:table/:id", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+// });
+
+module.exports = app;
