@@ -22,6 +22,11 @@ app.use(cors());
 
 const tables = Tables;
 
+app.get("/", async (req, res) => {
+ res.json("Hello world")
+})
+
+
 app.get("/api/:table", async (req, res) => {
   try {
     const { table } = req.params;

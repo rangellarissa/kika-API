@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "type": "commonjs",
   "description": "API for kika-app",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
