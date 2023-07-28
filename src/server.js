@@ -1,5 +1,10 @@
+import { createClient } from '@supabase/supabase-js'
 import { createServer } from 'http';
 import { readFile } from 'fs';
+
+const supabaseUrl = 'https://zakfzizunydhireohsxt.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 const server = createServer((req, res) => {
   // Set the content type to JSON
