@@ -11,6 +11,7 @@ const {
 } = require("./client/database");
 const express = require("express");
 const bodyParser = require("body-parser");
+const { Tables } = require("./utils/constants");
 
 const app = express();
 const port = process.env.PORT;
@@ -19,7 +20,7 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
-const tables = ["Exposicao", "Artista"]
+const tables = Tables;
 
 app.get("/api/:table", async (req, res) => {
   try {
