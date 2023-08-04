@@ -93,8 +93,10 @@ app.delete("/api/:table/:id", async (req, res) => {
   }
 });
 
-// app.listen(port, () => {
-//   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-// });
+if(port) {
+  app.listen(port, () => { 
+    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  })
+}
 
 module.exports = app;

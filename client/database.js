@@ -13,6 +13,18 @@ async function findAll(table) {
 }
 
 async function findOne(table, id) {
+  const tableWithImages = ['obra', 'exposicao', 'newsletter', 'novidade']
+  if (tableWithImages.includes(table)) {
+    const { data, error } = await supabase.from(table).select(`
+    *,  
+    imagem ( imageURL )
+  `).eq("id", id);
+    if (error) {
+      throw error;
+    }
+    return data ? data[0] : null;
+  }
+
   const { data, error } = await supabase.from(table).select().eq("id", id);
   if (error) {
     throw error;
