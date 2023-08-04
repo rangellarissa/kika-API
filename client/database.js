@@ -3,8 +3,19 @@ const { createClient } = require("@supabase/supabase-js");
 const supabaseUrl = 'https://zakfzizunydhireohsxt.supabase.co'
 const supabaseKey = process.env.SUPABASE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
+const tableWithImages = ['obra', 'exposicao', 'newsletter', 'novidade']
 
 async function findAll(table) {
+  if (tableWithImages.includes(table)) {
+    const { data, error } = await supabase.from(table).select(`
+    *,  
+    imagem ( imageURL )
+    `);
+    if (error) {
+      throw error;
+    }
+    return data;
+  };
   const { data, error } = await supabase.from(table).select("*");
   if (error) {
     throw error;
@@ -13,7 +24,6 @@ async function findAll(table) {
 }
 
 async function findOne(table, id) {
-  const tableWithImages = ['obra', 'exposicao', 'newsletter', 'novidade']
   if (tableWithImages.includes(table)) {
     const { data, error } = await supabase.from(table).select(`
     *,  
