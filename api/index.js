@@ -26,6 +26,13 @@ app.get("/", async (req, res) => {
  res.json("Hello world")
 })
 
+app.get("/api/debug-env", (req, res) => {
+  res.json({
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY ? "EXISTS" : "MISSING",
+  });
+});
+
 
 app.get("/api/:table", async (req, res) => {
   try {
@@ -91,13 +98,6 @@ app.delete("/api/:table/:id", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-});
-
-app.get("/debug-env", (req, res) => {
-  res.json({
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_KEY ? "EXISTS" : "MISSING",
-  });
 });
 
 if(port) {
