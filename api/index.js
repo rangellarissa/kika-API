@@ -93,6 +93,13 @@ app.delete("/api/:table/:id", async (req, res) => {
   }
 });
 
+app.get("/debug-env", (req, res) => {
+  res.json({
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY ? "EXISTS" : "MISSING",
+  });
+});
+
 if(port) {
   app.listen(port, () => { 
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
