@@ -42,6 +42,20 @@ async function findOne(table, id) {
   return data ? data[0] : null;
 }
 
+async function findBySlug(table, slug) {
+  const { data, error } = await supabase
+    .from(table)
+    .select("*")
+    .eq("slug", slug)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 async function create(table, body) {
   const { data, error } = await supabase
     .from(table)
@@ -75,6 +89,7 @@ async function remove(table, id) {
 module.exports = {
   findAll,
   findOne,
+  findBySlug,
   create,
   update,
   remove,
