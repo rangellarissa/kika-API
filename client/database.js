@@ -5,6 +5,17 @@ const supabaseKey = process.env.SUPABASE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
 const tableWithImages = ['obra', 'exposicao', 'novidade']
 
+function buildSelect(table) {
+  if (tableWithImages.includes(table)) {
+    return `
+      *,
+      imagem ( imageURL )
+    `;
+  }
+
+  return "*";
+}
+
 async function findAll(table) {
   if (tableWithImages.includes(table)) {
     const { data, error } = await supabase.from(table).select(`
@@ -24,36 +35,26 @@ async function findAll(table) {
 }
 
 async function findOne(table, id) {
-  if (tableWithImages.includes(table)) {
-    const { data, error } = await supabase.from(table).select(`
-    *,  
-    imagem ( imageURL )
-  `).eq("id", id);
-    if (error) {
-      throw error;
-    }
-    return data ? data[0] : null;
-  }
+  const { data, error } = await supabase
+    .from(table)
+    .select(buildSelect(table))
+    .eq("id", id);
 
-  const { data, error } = await supabase.from(table).select().eq("id", id);
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
+
   return data ? data[0] : null;
 }
 
 async function findBySlug(table, slug) {
   const { data, error } = await supabase
     .from(table)
-    .select("*")
+    .select(buildSelect(table))
     .eq("slug", slug)
     .single();
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  return data;
+  return data
 }
 
 async function create(table, body) {
