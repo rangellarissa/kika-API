@@ -46,6 +46,35 @@ async function findOne(table, id) {
 }
 
 async function findBySlug(table, slug) {
+
+  if (table === "exposicao") {
+
+    const { data, error } = await supabase
+      .from("exposicao")
+      .select(`
+        id,
+        titulo,
+        slug,
+        texto,
+        ano,
+        local,
+        exposicao_imagens (
+          ordem,
+          imagem (
+            imageURL
+          )
+        )
+      `)
+      .eq("slug", slug)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  }
+  
   const { data, error } = await supabase
     .from(table)
     .select(buildSelect(table))
