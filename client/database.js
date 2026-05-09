@@ -72,9 +72,14 @@ async function findBySlug(table, slug) {
       throw error;
     }
 
-    return data;
+    return {
+      ...data,
+      images: data.exposicao_imagens
+        .sort((a, b) => a.ordem - b.ordem)
+        .map(item => item.imagem.imageURL)
+    };
   }
-  
+
   const { data, error } = await supabase
     .from(table)
     .select(buildSelect(table))
