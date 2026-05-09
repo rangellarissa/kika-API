@@ -5,6 +5,7 @@ const cors = require("cors")
 const {
     findAll,
     findOne,
+    findBySlug,
     create,
     update,
     remove,
@@ -21,6 +22,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const tables = Tables;
+const slugTables = ["exposicao", "residencia"];
 
 app.get("/", async (req, res) => {
  res.json("Hello world")
@@ -45,6 +47,39 @@ app.get("/api/:table", async (req, res) => {
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/:table/by-slug/:slug", async (req, res) => {
+  try {
+    const { table, slug } = req.params;
+
+    if (!tables.includes(table)) {
+      return res.status(400).json({
+        message: "Tabela inválida"
+      });
+    }
+
+    if (!slugTables.includes(table)) {
+      return res.status(400).json({
+        message: "Slug não habilitado para esta tabela",
+      });
+    }
+
+    const data = await findBySlug(table, slug);
+
+    if (!data) {
+      return res.status(404).json({
+        message: "Não encontrado",
+      });
+    }
+
+    res.json(data);
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
   }
 });
 
