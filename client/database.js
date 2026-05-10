@@ -18,6 +18,31 @@ function buildSelect(table) {
 
 async function findAll(table) {
   if (tableWithImages.includes(table)) {
+
+    if (table === "exposicao") {
+      const { data, error } = await supabase
+        .from("exposicao")
+        .select(`
+          *,
+          exposicao_imagens (
+            ordem,
+            imagem (
+              imageURL
+            )
+          )
+        `);
+
+      if (error) {
+        throw error;
+      }
+
+      return data.map((item) => ({
+        ...item,
+        imagens: item.exposicao_imagens
+          ?.sort((a, b) => a.ordem - b.ordem)
+          .map((img) => img.imagem.imageURL) || []
+      }));
+    }
     const { data, error } = await supabase.from(table).select(`
     *,  
     imagem ( imageURL )
