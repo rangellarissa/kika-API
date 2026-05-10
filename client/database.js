@@ -38,7 +38,7 @@ async function findAll(table) {
 
       return data.map((item) => ({
         ...item,
-        imagens: item.exposicao_imagens
+        images: item.exposicao_imagens
           ?.sort((a, b) => a.ordem - b.ordem)
           .map((img) => img.imagem.imageURL) || []
       }));
