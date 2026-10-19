@@ -15,6 +15,12 @@
         ]
       },
       {
+        "source": "/api/(auth|upload-url|usuario|newsletter|exposicao_imagens)(.*)",
+        "headers": [
+          { "key": "Cache-Control", "value": "private, no-store" }
+        ]
+      },
+      {
       "source": "/api/obra",
       "headers": [
         {
