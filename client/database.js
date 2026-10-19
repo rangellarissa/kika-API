@@ -131,7 +131,8 @@ async function update(table, id, body = {}) {
   const { data, error } = await supabase
     .from(table)
     .update(body)
-    .eq("id", id);
+    .eq("id", id)
+    .select();
   if (error) {
     throw error;
   }
@@ -139,7 +140,7 @@ async function update(table, id, body = {}) {
 }
 
 async function remove(table, id) {
-  const { data, error } = await supabase.from(table).delete().eq("id", id);
+  const { data, error } = await supabase.from(table).delete().eq("id", id).select();
   if (error) {
     throw error;
   }
@@ -147,6 +148,7 @@ async function remove(table, id) {
 }
 
 module.exports = {
+  supabase,
   findAll,
   findOne,
   findBySlug,

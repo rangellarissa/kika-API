@@ -3,6 +3,7 @@ require("dotenv").config();
 const cors = require("cors")
 
 const {
+    supabase,
     findAll,
     findOne,
     findBySlug,
@@ -12,7 +13,8 @@ const {
 } = require("../client/database");
 const express = require("express");
 const bodyParser = require("body-parser");
-const { Tables } = require("../utils/constants");
+const { requireAdmin } = require("./auth");
+const { Tables, PrivateTables, WritableTables, StorageBucket } = require("../utils/constants");
 
 const app = express();
 const port = process.env.PORT;
@@ -22,28 +24,71 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const tables = Tables;
+app.use("/api", (req, res, next) => {
+  if (req.method !== "GET") res.set("Cache-Control", "no-store");
+  next();
+});
+
 const slugTables = ["exposicao", "residencia"];
 
 app.get("/", async (req, res) => {
  res.json("Hello world")
 })
 
-app.get("/api/debug-env", (req, res) => {
-  res.json({
-    url: process.env.SUPABASE_URL,
-    key: process.env.SUPABASE_KEY ? "EXISTS" : "MISSING",
-  });
+// Only admins can read private tables or write anything.
+function validateTable(tableList) {
+  return (req, res, next) => {
+    if (!tableList.includes(req.params.table)) {
+      return res.status(400).json({ message: "Tabela inválida" });
+    }
+    next();
+  };
+}
+
+const readTable = (req, res, next) => {
+  if (PrivateTables.includes(req.params.table)) {
+    return requireAdmin(req, res, next);
+  }
+  next();
+};
+
+// Lets the admin UI check whether the logged-in user is an admin.
+app.get("/api/auth/me", requireAdmin, (req, res) => {
+  res.json({ id: req.user.id, email: req.user.email, role: "admin" });
 });
 
-
-app.get("/api/:table", async (req, res) => {
+// Returns a one-time URL so the browser uploads the file straight to Storage
+// (avoids Vercel's request body limit). Afterwards, POST /api/imagem with publicUrl.
+app.post("/api/upload-url", requireAdmin, async (req, res) => {
   try {
-    const { table } = req.params;
-    if(!tables.includes(table)){
-        res.status(400).json({ message: "Tabela inválida"})
-        return;
-    };
-    const data = await findAll(table);
+    const { filename } = req.body;
+    if (!filename) {
+      return res.status(400).json({ message: "filename é obrigatório" });
+    }
+    const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${Date.now()}-${safeName}`;
+
+    const { data, error } = await supabase.storage
+      .from(StorageBucket)
+      .createSignedUploadUrl(path);
+    if (error) throw error;
+
+    const { data: pub } = supabase.storage.from(StorageBucket).getPublicUrl(path);
+
+    res.json({
+      path,
+      token: data.token,
+      signedUrl: data.signedUrl,
+      publicUrl: pub.publicUrl,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/:table", validateTable(Tables), readTable, async (req, res) => {
+  try {
+    const data = await findAll(req.params.table);
     res.json(data);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -83,16 +128,15 @@ app.get("/api/:table/by-slug/:slug", async (req, res) => {
   }
 });
 
-app.get("/api/:table/:id", async (req, res) => {
+app.get("/api/:table/:id", validateTable(Tables), readTable, async (req, res) => {
   try {
     const { id, table } = req.params;
-//TODO: validar o id e table como em cima
+
     const data = await findOne(table, id);
 
-    if (!data){
-        res.status(400).json({ message: "Não existe"});
-        return;
-    };
+    if (!data) {
+      return res.status(404).json({ message: "Não existe" });
+    }
 
     res.json(data);
   } catch (error) {
@@ -100,30 +144,32 @@ app.get("/api/:table/:id", async (req, res) => {
   }
 });
 
-app.post("/api/:table", async (req, res) => {
+app.post("/api/:table", requireAdmin, validateTable(WritableTables), async (req, res) => {
   try {
-
-    const newTask = await create(table, req.body);
-    res.status(201).json(newTask);
-    
+    const created = await create(req.params.table, req.body);
+    res.status(201).json(created);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.put("/api/:table/:id", async (req, res) => {
+app.put("/api/:table/:id", requireAdmin, validateTable(WritableTables), async (req, res) => {
   try {
     const { id, table } = req.params;
 
-    await update(table, id, req.body);
+    const updated = await update(table, id, req.body);
 
-    res.status(204).end();
+    if (!updated || updated.length === 0) {
+      return res.status(404).json({ message: "Não existe" });
+    }
+
+    res.json(updated[0]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.delete("/api/:table/:id", async (req, res) => {
+app.delete("/api/:table/:id", requireAdmin, validateTable(WritableTables), async (req, res) => {
   try {
     const { table, id } = req.params;
 
