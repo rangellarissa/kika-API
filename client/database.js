@@ -91,11 +91,13 @@ async function findBySlug(table, slug) {
         )
       `)
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (error) {
       throw error;
     }
+
+    if (!data) return null;
 
     return {
       ...data,
@@ -109,7 +111,7 @@ async function findBySlug(table, slug) {
     .from(table)
     .select(buildSelect(table))
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
 
