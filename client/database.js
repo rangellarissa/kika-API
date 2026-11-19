@@ -3,9 +3,20 @@ const { createClient } = require("@supabase/supabase-js");
 const supabaseUrl = 'https://eyhkeplvlebxzwydslpe.supabase.co'
 const supabaseKey = process.env.SUPABASE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
-const tableWithImages = ['obra', 'exposicao', 'novidade']
+const tableWithImages = ['obra', 'exposicao', 'novidade', 'research']
+
+// research already has a column called imagem (the image id), so list its columns and
+// let imagem be only the joined image; selecting "*" too would return the key twice.
+const researchSelect = `
+      id, created_at, data, titulo, autora, texto,
+      imagem ( id, imageURL )
+    `;
 
 function buildSelect(table) {
+  if (table === "research") {
+    return researchSelect;
+  }
+
   if (tableWithImages.includes(table)) {
     return `
       *,
@@ -43,10 +54,7 @@ async function findAll(table) {
           .map((img) => img.imagem.imageURL) || []
       }));
     }
-    const { data, error } = await supabase.from(table).select(`
-    *,  
-    imagem ( imageURL )
-    `);
+    const { data, error } = await supabase.from(table).select(buildSelect(table));
     if (error) {
       throw error;
     }
