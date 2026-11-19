@@ -3,7 +3,7 @@ const { createClient } = require("@supabase/supabase-js");
 const supabaseUrl = 'https://eyhkeplvlebxzwydslpe.supabase.co'
 const supabaseKey = process.env.SUPABASE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseKey);
-const tableWithImages = ['obra', 'exposicao', 'novidade']
+const tableWithImages = ['obra', 'exposicao', 'novidade', 'research']
 
 function buildSelect(table) {
   if (tableWithImages.includes(table)) {
